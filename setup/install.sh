@@ -1,33 +1,49 @@
 #!/bin/bash
 
-# Обновление системы и установка необходимых пакетов
-echo "Обновляем систему и устанавливаем X-сервер, BSPWM и Polybar..."
-pacman -Syu --noconfirm
-pacman -S --noconfirm xorg-server xorg-xinit bspwm polybar
+# Остановить выполнение при ошибке
+set -e
+
+echo "Обновляем систему..."
+sudo pacman -Syu --noconfirm
+
+# Проверка и установка недостающих пакетов
+packages=("xorg-server" "xorg-xinit" "bspwm" "polybar" "micro")
+
+for pkg in "${packages[@]}"; do
+    if pacman -Q $pkg &>/dev/null; then
+        echo "$pkg уже установлен."
+    else
+        echo "Устанавливаем $pkg..."
+        sudo pacman -S --noconfirm $pkg
+    fi
+done
+
+# Проверяем, установились ли пакеты
+if pacman -Q "${packages[@]}" &>/dev/null; then
+    echo "Все пакеты установлены!"
+else
+    echo "Ошибка: не удалось установить один или несколько пакетов."
+    exit 1
+fi
 
 # Создание ~/.xinitrc для запуска BSPWM
 echo "exec bspwm" > ~/.xinitrc
 
-# Проверка создания ~/.xinitrc
 if [ -f ~/.xinitrc ]; then
-  echo "~/.xinitrc был успешно создан!"
+    echo "~/.xinitrc успешно создан!"
 else
-  echo "Ошибка: не удалось создать ~/.xinitrc"
+    echo "Ошибка: ~/.xinitrc не был создан!"
+    exit 1
 fi
 
-# Копирование конфигурации BSPWM из папки setup/configs/bspwm
-echo "Копируем конфигурацию BSPWM..."
-mkdir -p ~/.config/bspwm
-cp ~/setup/configs/bspwm/* ~/.config/bspwm/
+# Копирование конфигов
+echo "Копируем конфигурации BSPWM и Polybar..."
+mkdir -p ~/.config/bspwm ~/.config/polybar
 
-# Копирование конфигурации Polybar из папки setup/configs/polybar
-echo "Копируем конфигурацию Polybar..."
-mkdir -p ~/.config/polybar
-cp ~/setup/configs/polybar/* ~/.config/polybar/
+cp -r ~/setup/configs/bspwm/* ~/.config/bspwm/
+cp -r ~/setup/configs/polybar/* ~/.config/polybar/
 
-# Самоудаление скрипта и папки с установочными файлами
-echo "Удаляем установочный скрипт и папки с конфигами..."
+echo "Удаляем установочный скрипт и папку setup..."
 rm -rf ~/setup
 
-# Завершаем
-echo "Установка завершена."
+echo "Установка завершена! Перезапусти систему и запусти X с помощью startx."
