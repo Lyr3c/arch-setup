@@ -1,27 +1,33 @@
 #!/bin/bash
 
-# Установка базовых зависимостей
-echo "Установка базовых зависимостей..."
-sudo pacman -S --noconfirm bspwm polybar git xorg xorg-xinit
+# Обновление системы и установка необходимых пакетов
+echo "Обновляем систему и устанавливаем X-сервер, BSPWM и Polybar..."
+pacman -Syu --noconfirm
+pacman -S --noconfirm xorg-server xorg-xinit bspwm polybar
 
-# Создание директорий для конфигов
-echo "Создание директорий для конфигов..."
+# Создание ~/.xinitrc для запуска BSPWM
+echo "exec bspwm" > ~/.xinitrc
+
+# Проверка создания ~/.xinitrc
+if [ -f ~/.xinitrc ]; then
+  echo "~/.xinitrc был успешно создан!"
+else
+  echo "Ошибка: не удалось создать ~/.xinitrc"
+fi
+
+# Копирование конфигурации BSPWM из папки setup/configs/bspwm
+echo "Копируем конфигурацию BSPWM..."
 mkdir -p ~/.config/bspwm
+cp ~/setup/configs/bspwm/* ~/.config/bspwm/
+
+# Копирование конфигурации Polybar из папки setup/configs/polybar
+echo "Копируем конфигурацию Polybar..."
 mkdir -p ~/.config/polybar
+cp ~/setup/configs/polybar/* ~/.config/polybar/
 
-# Копирование конфигов из репозитория в нужные директории
-echo "Копирование конфигов в систему..."
-cp -r ./configs/bspwm/bspwmrc ~/.config/bspwm/
-cp -r ./configs/polybar/config ~/.config/polybar/
-
-# Настройка прав доступа к файлам конфигурации
-echo "Настройка прав доступа..."
-chmod +x ~/.config/bspwm/bspwmrc
-
-# Завершающие сообщения
-echo "Установка и настройка завершены."
-echo "Не забудьте настроить автозапуск BSPWM и Polybar, а также перезапустите систему."
-
-# Удаление установочного скрипта и конфигов после установки
-echo "Удаление установочного скрипта и конфигов..."
+# Самоудаление скрипта и папки с установочными файлами
+echo "Удаляем установочный скрипт и папки с конфигами..."
 rm -rf ~/setup
+
+# Завершаем
+echo "Установка завершена."
