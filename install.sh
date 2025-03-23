@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Ask for sudo password once and keep it cached
+echo "Requesting sudo access..."
+sudo -v
+
+# Keep sudo session alive in the background
+while true; do sudo -v; sleep 60; done &
+
 echo "Welcome to the Arch Linux installation script!"
 
 echo "Installing micro..."
