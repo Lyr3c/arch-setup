@@ -59,15 +59,6 @@ else
     echo ".xinitrc file not found! Skipping this step."
 fi
 
-echo "Installing yay..."
-sudo pacman -S --noconfirm yay >/dev/null 2>&1
-
-echo "Installing paru..."
-git clone https://aur.archlinux.org/paru.git ~/paru
-cd ~/paru
-makepkg -si --noconfirm >/dev/null 2>&1
-cd ~
-
 echo "Installation complete! Restarting system..."
 sleep 3
 reboot
