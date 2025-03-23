@@ -1,6 +1,6 @@
 #!/bin/zsh
 
 sxhkd &
-polybar examples &
+polybar example &
 
 exec bspwm
