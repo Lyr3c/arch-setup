@@ -1,68 +1,66 @@
 #!/bin/bash
 
-echo "Добро пожаловать в установочный скрипт Arch Linux!"
+echo "Welcome to the Arch Linux installation script!"
 
-echo "Устанавливаем micro..."
-sudo pacman -S --noconfirm micro
+echo "Installing micro..."
+sudo pacman -S --noconfirm micro >/dev/null 2>&1
 
-read -p "Вы запускаете систему в VirtualBox? (yes/no): " vbox
+read -p "Are you running this system in VirtualBox? (yes/no): " vbox
 if [[ "$vbox" == "yes" ]]; then
-    echo "Устанавливаем VirtualBox Guest Utils..."
-    sudo pacman -S --noconfirm virtualbox-guest-utils
+    echo "Installing VirtualBox Guest Utils..."
+    sudo pacman -S --noconfirm virtualbox-guest-utils >/dev/null 2>&1
     sudo systemctl enable vboxservice
     sudo systemctl start vboxservice
 fi
 
-echo "Устанавливаем Xorg..."
-sudo pacman -S --noconfirm xorg xorg-server xorg-xinit
+echo "Installing Xorg..."
+sudo pacman -S --noconfirm xorg xorg-server xorg-xinit >/dev/null 2>&1
 
-echo "Устанавливаем bspwm..."
-sudo pacman -S --noconfirm bspwm
+echo "Installing bspwm..."
+sudo pacman -S --noconfirm bspwm >/dev/null 2>&1
 
-echo "Устанавливаем sxhkd..."
-sudo pacman -S --noconfirm sxhkd
+echo "Installing sxhkd..."
+sudo pacman -S --noconfirm sxhkd >/dev/null 2>&1
 
-echo "Устанавливаем терминал Alacritty..."
-sudo pacman -S --noconfirm alacritty
+echo "Installing Alacritty terminal..."
+sudo pacman -S --noconfirm alacritty >/dev/null 2>&1
 
-echo "Устанавливаем Polybar..."
-sudo pacman -S --noconfirm polybar
+echo "Installing Polybar..."
+sudo pacman -S --noconfirm polybar >/dev/null 2>&1
 
-echo "Устанавливаем Zsh и Oh My Zsh..."
-sudo pacman -S --noconfirm zsh
+echo "Installing Zsh..."
+sudo pacman -S --noconfirm zsh >/dev/null 2>&1
 chsh -s /usr/bin/zsh
-echo "Скачиваем и устанавливаем Oh My Zsh..."
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-echo "Перемещаем конфигурационные файлы..."
+echo "Downloading and installing Oh My Zsh..."
+export RUNZSH=no
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >/dev/null 2>&1
+
+echo "Moving configuration files..."
 CONFIG_DIR=~/arch-setup/home/configs
 if [ -d "$CONFIG_DIR" ]; then
     cp -r $CONFIG_DIR/{bspwm,sxhkd,polybar} ~/.config/
     chmod +x ~/.config/bspwm/bspwmrc
 else
-    echo "Папка с конфигурациями не найдена! Пропускаем этот шаг."
+    echo "Configuration folder not found! Skipping this step."
 fi
 
-echo "Перемещаем .xinitrc..."
+echo "Moving .xinitrc..."
 if [ -f ~/arch-setup/home/.xinitrc ]; then
     cp ~/arch-setup/home/.xinitrc ~/
 else
-    echo "Файл .xinitrc не найден! Пропускаем этот шаг."
+    echo ".xinitrc file not found! Skipping this step."
 fi
 
-echo "Устанавливаем yay..."
-cd ~
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si --noconfirm
+echo "Installing yay..."
+sudo pacman -S --noconfirm yay >/dev/null 2>&1
+
+echo "Installing paru..."
+git clone https://aur.archlinux.org/paru.git ~/paru
+cd ~/paru
+makepkg -si --noconfirm >/dev/null 2>&1
 cd ~
 
-echo "Устанавливаем paru..."
-git clone https://aur.archlinux.org/paru.git
-cd paru
-makepkg -si --noconfirm
-cd ~
-
-echo "Установка завершена! Перезагрузка..."
+echo "Installation complete! Restarting system..."
 sleep 3
 reboot
